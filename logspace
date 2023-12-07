@@ -1,0 +1,26 @@
+USE [master]
+GO
+/****** Object:  StoredProcedure [dbo].[log_space]    Script Date: 12/7/2023 12:34:21 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+  
+  
+  
+ALTER proc [dbo].[log_space]  
+  
+  
+  
+as  
+  
+  
+  
+select b.name,a.fileid,b.recovery_model_desc,b.log_reuse_wait,b.log_reuse_wait_desc,(a.size*8)/(1024*1024)as log from sys.databases b,sys.sysaltfiles a  
+  
+where a.dbid = b.database_id and a.filename like '%.ldf'and (a.size*8)/(1024*1024)>0.9  
+  
+  
