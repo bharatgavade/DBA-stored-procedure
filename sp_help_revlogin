@@ -1,0 +1,67 @@
+USE [master]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_rootblocker]    Script Date: 12/9/2023 5:39:52 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+ 
+
+ALTER  procedure [dbo].[sp_rootblocker] as
+
+begin
+
+set nocount on
+
+ 
+
+IF EXISTS (SELECT * FROM master..sysprocesses p1 JOIN master..sysprocesses p2 ON (p1.spid=p2.blocked)) BEGIN
+
+DECLARE @spid int
+
+SELECT @spid=p1.spid 
+
+FROM master..sysprocesses p1 JOIN master..sysprocesses p2 ON (p1.spid=p2.blocked)
+
+WHERE p1.blocked=0
+
+SELECT p1.spid,
+
+p1.status,
+
+loginame=LEFT(p1.loginame,20),
+
+hostname=substring(p1.hostname,1,20),
+
+blk=CONVERT(char(3),p1.blocked),
+
+db=LEFT(db_name(p1.dbid),10),
+
+p1.cmd,
+
+p1.waittype
+
+FROM master..sysprocesses p1
+
+JOIN master..sysprocesses p2 ON (p1.spid=p2.blocked)
+
+WHERE p1.blocked=0
+
+select @spid  
+END ELSE BEGIN
+
+PRINT 'No processes are currently blocking others.'
+
+select GetDate()
+
+END
+
+end
+
+ 
+
+
+
